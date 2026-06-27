@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Resume Analyzer</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+
+🤖
+
+</div>
+
+<h1>AI Resume Analyzer</h1>
+
+<p>
+
+Upload your resume, compare it with a Job Description,
+and receive an ATS score with AI-powered suggestions.
+
+</p>
+
+<form action="/analyze" method="POST" enctype="multipart/form-data">
+
+<div class="upload-box">
+
+<h2>📄 Upload Resume</h2>
+
+<input
+type="file"
+name="resume"
+accept=".pdf"
+required>
+
+</div>
+
+<br>
+
+<div class="jd-box">
+
+<h2>💼 Job Description</h2>
+
+<textarea
+
+name="job_description"
+
+placeholder="Paste the Job Description here...
+
+Example:
+
+Python
+Flask
+SQL
+Docker
+REST API
+Git
+Machine Learning"
+
+></textarea>
+
+</div>
+
+<br>
+
+<button type="submit">
+
+🚀 Analyze Resume
+
+</button>
+
+</form>
+
+<div class="features">
+
+<div class="feature">
+
+<h3>🎯 ATS Score</h3>
+
+<p>
+
+Know how ATS-friendly your resume is.
+
+</p>
+
+</div>
+
+<div class="feature">
+
+<h3>🤖 AI Suggestions</h3>
+
+<p>
+
+Receive personalized recommendations.
+
+</p>
+
+</div>
+
+<div class="feature">
+
+<h3>📊 Resume Match</h3>
+
+<p>
+
+Compare your resume with any Job Description.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>

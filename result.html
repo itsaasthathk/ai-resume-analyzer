@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🤖 Resume Analysis Dashboard</h1>
+
+    <!-- Candidate Information -->
+
+    <div class="card">
+
+        <h2>👤 Candidate Information</h2>
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <h3>Name</h3>
+
+                <p>{{ candidate.name }}</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>Email</h3>
+
+                <p>{{ candidate.email }}</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>Phone</h3>
+
+                <p>{{ candidate.phone }}</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>GitHub</h3>
+
+                <p>{{ candidate.github }}</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>LinkedIn</h3>
+
+                <p>{{ candidate.linkedin }}</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+   <!-- ATS Score -->
+
+<div class="card">
+
+    <h2 style="text-align:center;">🎯 ATS Score</h2>
+
+    <div style="width:260px;height:260px;margin:auto;">
+
+        <canvas id="atsChart"></canvas>
+
+    </div>
+
+    {% if score >= 85 %}
+
+        <p class="excellent">Excellent Resume</p>
+
+    {% elif score >= 70 %}
+
+        <p class="strong">Strong Resume</p>
+
+    {% elif score >= 60 %}
+
+        <p class="good">Good Resume</p>
+
+    {% else %}
+
+        <p class="poor">Needs Improvement</p>
+
+    {% endif %}
+
+</div>
+      
+<!-- ========================= -->
+<!-- Resume Breakdown -->
+<!-- ========================= -->
+
+<div class="card">
+
+    <h2>📊 Resume Breakdown</h2>
+
+    <div class="breakdown">
+
+        {% for name, value in section.items() %}
+
+        <div class="item">
+
+            <span>
+                {% if name == "skills" %}
+                    💻 Skills
+                {% elif name == "projects" %}
+                    📁 Projects
+                {% elif name == "education" %}
+                    🎓 Education
+                {% elif name == "experience" %}
+                    💼 Experience
+                {% elif name == "formatting" %}
+                    📄 Formatting
+                {% endif %}
+            </span>
+
+            <span>{{ value }}%</span>
+
+        </div>
+
+        <div class="bar">
+
+            <div class="fill" data-width="{{ value }}"></div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+    <!-- Resume Analysis -->
+
+    <div class="card">
+
+        <h2>📊 Resume Analysis</h2>
+
+        <div style="width:320px;height:320px;margin:auto;">
+
+            <canvas id="resumeChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- Resume Statistics -->
+
+    <div class="card">
+
+        <h2>📈 Resume Statistics</h2>
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <h3>{{ stats.words }}</h3>
+
+                <p>Words</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>{{ stats.pages }}</h3>
+
+                <p>Pages</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>
+
+                    {% if stats.email %}
+
+                        ✅
+
+                    {% else %}
+
+                        ❌
+
+                    {% endif %}
+
+                </h3>
+
+                <p>Email</p>
+
+            </div>
+
+            <div class="stat">
+
+                <h3>
+
+                    {% if stats.phone %}
+
+                        ✅
+
+                    {% else %}
+
+                        ❌
+
+                    {% endif %}
+
+                </h3>
+
+                <p>Phone</p>
+
+            </div>
+
+        </div>
+
+    </div>
+        <!-- ========================= -->
+    <!-- Skills Found -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>🟢 Skills Found</h2>
+
+        <div class="skill-container">
+
+            {% for skill in skills %}
+
+                <span class="skill green">
+
+                    {{ skill.title() }}
+
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- Missing Skills -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>🔴 Missing Skills</h2>
+
+        <div class="skill-container">
+
+            {% for skill in missing[:10] %}
+
+                <span class="skill red">
+
+                    {{ skill.title() }}
+
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- AI Suggestions -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>🤖 AI Suggestions</h2>
+
+        <ul>
+
+            {% for item in suggestions %}
+
+                <li>{{ item }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- Resume Preview -->
+    <!-- ========================= -->
+
+<div class="card">
+
+    <h2>📄 Resume Preview</h2>
+
+    <div class="preview">
+
+        {{ preview | safe }}
+
+    </div>
+
+</div>
+<!-- ========================= -->
+<!-- Charts -->
+<!-- ========================= -->
+
+<script>
+
+// =======================
+// ATS Score Chart
+// =======================
+
+const score = Number("{{ score }}");
+
+new Chart(document.getElementById("atsChart"),{
+
+    type:"doughnut",
+
+    data:{
+
+        datasets:[{
+
+            data:[score,100-score],
+
+            backgroundColor:[
+
+                score>=80?"#22c55e":
+                score>=60?"#f59e0b":
+                "#ef4444",
+
+                "#2e3b55"
+
+            ],
+
+            borderWidth:0
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        cutout:"78%",
+
+        plugins:{
+
+            legend:{
+                display:false
+            },
+
+            tooltip:{
+                enabled:false
+            }
+
+        }
+
+    },
+
+    plugins:[{
+
+        id:"text",
+
+        beforeDraw(chart){
+
+            const width=chart.width;
+
+            const height=chart.height;
+
+            const ctx=chart.ctx;
+
+            ctx.restore();
+
+            ctx.font="bold 42px Arial";
+
+            ctx.fillStyle="#ffffff";
+
+            ctx.textAlign="center";
+
+            ctx.fillText(score+"%",width/2,height/2+15);
+
+            ctx.font="18px Arial";
+
+            ctx.fillStyle="#cbd5e1";
+
+            ctx.fillText("ATS Score",width/2,height/2+45);
+
+            ctx.save();
+
+        }
+
+    }]
+
+});
+
+
+// =======================
+// Skills Chart
+// =======================
+
+const skillsFound = Number("{{ skills|length }}");
+
+const skillsMissing = Number("{{ missing|length }}");
+
+new Chart(document.getElementById("resumeChart"),{
+
+    type:"doughnut",
+
+    data:{
+
+        labels:[
+
+            "Skills Found",
+
+            "Missing Skills"
+
+        ],
+
+        datasets:[{
+
+            data:[
+
+                skillsFound,
+
+                skillsMissing
+
+            ],
+
+            backgroundColor:[
+
+                "#22c55e",
+
+                "#ef4444"
+
+            ],
+
+            borderWidth:0
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        cutout:"65%",
+
+        plugins:{
+
+            legend:{
+
+                position:"bottom",
+
+                labels:{
+
+                    color:"#ffffff",
+
+                    font:{
+
+                        size:14
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+<script>
+
+document.querySelectorAll(".fill").forEach(bar=>{
+
+    bar.style.width = bar.dataset.width + "%";
+
+});
+
+</script>
+
+</body>
+
+</html>
